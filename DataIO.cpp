@@ -147,7 +147,7 @@ int64_t DataIO::ReadUnmergeData(int64_t* MergeMemInBufSingle, FILE * fPtrMergeSi
             cout<<"Reading unmerged data error"<<endl;
         }
     }
-	cout << "Nums read from Sortfile to MergeMem input Buffer: " << numRead << " Nums" << endl;
+	cout << "*** Nums read from Sortfile to MergeMem input Buffer: " << numRead << " Nums" << endl;
 
     return numRead;
 }
@@ -162,6 +162,6 @@ int64_t DataIO::WriteMergeData(int64_t* MergeMemOutbuf, FILE * fPtrOut, int64_t 
     else { // 缓冲区未满
         numWrited = fwrite(MergeMemOutbuf,sizeof(int64_t),OutbufPos,fPtrOut);
     }
-	cout << "***** nWrited to Out file: " << numWrited << endl;
+	cout << "*** nWrited to Out file: " << numWrited << endl;
     return numWrited;
-}
+} // https://github.com/slDeng1003

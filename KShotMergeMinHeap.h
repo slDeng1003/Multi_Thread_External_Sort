@@ -20,4 +20,4 @@ private:
 
 };
 
-#endif
+#endif // https://github.com/slDeng1003

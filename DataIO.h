@@ -34,4 +34,4 @@ private:
     int64_t HashFunc(int64_t X);
 };
 
-#endif
+#endif // https://github.com/slDeng1003

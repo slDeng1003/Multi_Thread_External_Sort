@@ -11,10 +11,17 @@ const unsigned short RandomFileNum = 16; // 随机数文件个数，同时也是
 const int64_t modnum = 1125899906842679; // 素数作为模数可保证随机性
 const int64_t ID = 80316; // 学号后5位
 
-const int64_t MemSize = 8388608; // 8 M，随机数文件大小（用于生成单个随机数文件的内存）
-const int64_t MemSizeBlock = 1048576; // 1M,MemSize/8,代表内存中int64_t的数量
-const int64_t ExSize = 134217728; // 128 M，外部磁盘大小（存储排序后数据）
-const int64_t ExSizeBlock = 16777216; // 16 M
+// middle file
+const int64_t MemSize = 1073741824; // 1G，单个随机数文件大小（用于生成单个随机数文件的内存）
+const int64_t MemSizeBlock = 134217728; // 1/8G,MemSize/8,代表内存中int64_t的数量
+const int64_t ExSizeBlock = 2147483648; // 16/8=2G
+
+// // small file
+// const int64_t MemSize = 8388608; // 8 M，单个随机数文件大小（用于生成单个随机数文件的内存）
+// const int64_t MemSizeBlock = 1048576; // 1M,MemSize/8,代表内存中int64_t的数量
+// const int64_t ExSize = 134217728; // 128 M，外部磁盘大小（存储排序后数据）
+// const int64_t ExSizeBlock = 16777216; // 16 M
+
 // large InBuf, large OutBuf
 // const int64_t MergeInBufSize = 4194304; // 4M,归并排序单个输入缓冲区大小
 // const int64_t MergeOutBufSize = 33554432; // 32M,归并排序输出缓冲区大小
@@ -45,4 +52,4 @@ const int64_t MergeOutBufSize = 4194304; // 4M,归并排序输出缓冲区大小
 const int64_t MergeInBufSizeBlock = 131072; // 1/8M,MergeInBufSize/8,代表输入缓冲区int64_t容量
 const int64_t MergeOutBufSizeBlock = 524288; // 1/2M,MergeOutBufSize/8,代表输出缓冲区int64_t容量
 
-#endif
+#endif // https://github.com/slDeng1003

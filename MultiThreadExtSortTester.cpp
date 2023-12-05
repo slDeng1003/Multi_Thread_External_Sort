@@ -69,14 +69,15 @@ int main(){
 	FILE ** fPtrSort = (FILE**)malloc(16*sizeof(FILE *));
 	unsigned short ThreadNum = 16;
 	ThreadPool ThreadPoolExecutor{ ThreadNum }; // 定义线程池
+	unsigned short SortThread = 4;
 	vector <string> filenameSort;
 	vector< future<void> > SortResult;
-	for (i=0; i<16; i++) {
+	for (i=0; i<SortThread; i++) {
 		filenameSort.push_back(string("./data/data_sort/data_sort")+to_string(i)+string(".bin"));
 		SortResult.emplace_back(ThreadPoolExecutor.commit(dataio.RandDataFileSort, SortMem[i],filenameUnsort[i], fPtrUnsort[i], filenameSort[i], fPtrSort[i]));
 	}
 	// 等待线程排序完成
-	for (i=0;i<16;i++) {
+	for (i=0; i<SortThread; i++) {
 		SortResult[i].get();
 	}
 
@@ -116,8 +117,6 @@ int main(){
 
 	// ThreadPool ThreadPoolExecutor{ ThreadNum }; // 定义线程池
 	vector< future<void> > MergeResult;
-
-
 
 	for (i=0; i<MergeThread; i++) {
 		
@@ -195,4 +194,4 @@ int main(){
 	free(MergeMemOutbuf);
 
 	return 0;
-}
+} // https://github.com/slDeng1003
