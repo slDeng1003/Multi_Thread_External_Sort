@@ -1,0 +1,394 @@
+注：
+// small file
+const int64_t MemSize = 8388608; // 8 M，单个随机数文件大小（用于生成单个随机数文件的内存）
+const int64_t MemSizeBlock = 1048576; // 1M,MemSize/8,代表内存中int64_t的数量
+const int64_t ExSize = 134217728; // 128 M，外部磁盘大小（存储排序后数据）
+const int64_t ExSizeBlock = 16777216; // 16 M
+// sort memory
+const int64_t SortMemSize = 2097152; // 2MB，用于单线程排序
+const int64_t SortMemSizeBlock = 262144; // 1/4M，单线程排序处理的最大数据量
+// small InBuf, small OutBuf
+const int64_t MergeInBufSize = 1048576; // 1M,归并排序单个输入缓冲区大小
+const int64_t MergeOutBufSize = 4194304; // 4M,归并排序输出缓冲区大小
+const int64_t MergeInBufSizeBlock = 131072; // 1/8M,MergeInBufSize/8,代表输入缓冲区int64_t容量
+const int64_t MergeOutBufSizeBlock = 524288; // 1/2M,MergeOutBufSize/8,代表输出缓冲区int64_t容量
+输出：
+Success to generate numbers
+======== start sort for ./data/data_random/data_random1.bin=======
+======== start sort for ./data/data_random/data_random0.bin=======
+======== start sort for ./data/data_random/data_random2.bin=======
+======== start sort for ./data/data_random/data_random8.bin=======
+======== start sort for ./data/data_random/data_random7.bin=======
+======== start sort for ./data/data_random/data_random9.bin=======
+======== start sort for ./data/data_random/data_random4.bin=======
+======== start sort for ./data/data_random/data_random3.bin=======
+======== start sort for ./data/data_random/data_random5.bin=======
+======== start sort for ./data/data_random/data_random6.bin=======
+======== start sort for ./data/data_random/data_random11.bin=======
+======== start sort for ./data/data_random/data_random15.bin=======
+======== start sort for ./data/data_random/data_random14.bin=======
+======== start sort for ./data/data_random/data_random12.bin=======
+======== start sort for ./data/data_random/data_random13.bin=======
+======== start sort for ./data/data_random/data_random10.bin=======
+=======./data/data_random/data_random0.bin sort over ========
+=======./data/data_random/data_random2.bin sort over ========
+SortQueue.size(): 2
+=======./data/data_random/data_random5.bin sort over ========
+=======./data/data_random/data_random1.bin sort over ========
+SortQueue.size(): 2
+=======./data/data_random/data_random11.bin sort over ========
+=======./data/data_random/data_random15.bin sort over ========
+=======./data/data_random/data_random14.bin sort over ========
+SortQueue.size(): 3
+=======./data/data_random/data_random7.bin sort over ========
+=======./data/data_random/data_random12.bin sort over ========
+SortQueue.size(): 2
+=======./data/data_random/data_random6.bin sort over ========
+=======./data/data_random/data_random4.bin sort over ========
+=======./data/data_random/data_random13.bin sort over ========
+SortQueue.size(): 3
+=======./data/data_random/data_random10.bin sort over ========
+=======./data/data_random/data_random3.bin sort over ========
+SortQueue.size(): 2
+=======./data/data_random/data_random8.bin sort over ========
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 1048576, filePos[0]: 1048576
+fileNum[1]: 1048576, filePos[1]: 1048576
+pushNumCnt[0]: 1048576
+pushNumCnt[1]: 1048576
+Nums write to out file: 2097152
+======== All num merged ========
+=======./data/data_random/data_random9.bin sort over ========
+SortQueue.size(): 2
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 1048576, filePos[0]: 1048576
+fileNum[1]: 1048576, filePos[1]: 1048576
+pushNumCnt[0]: 1048576
+pushNumCnt[1]: 1048576
+Nums write to out file: 2097152
+======== All num merged ========
+MergeQueue.size(): 2
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 1048576, filePos[0]: 1048576
+fileNum[1]: 1048576, filePos[1]: 1048576
+pushNumCnt[0]: 1048576
+pushNumCnt[1]: 1048576
+Nums write to out file: 2097152
+======== All num merged ========
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 1048576, filePos[0]: 1048576
+fileNum[1]: 1048576, filePos[1]: 1048576
+pushNumCnt[0]: 1048576
+pushNumCnt[1]: 1048576
+Nums write to out file: 2097152
+======== All num merged ========
+MergeQueue.size(): 2
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 1048576, filePos[0]: 1048576
+fileNum[1]: 1048576, filePos[1]: 1048576
+pushNumCnt[0]: 1048576
+pushNumCnt[1]: 1048576
+Nums write to out file: 2097152
+======== All num merged ========
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 1048576, filePos[0]: 1048576
+fileNum[1]: 1048576, filePos[1]: 1048576
+fileNum[2]: 1048576, filePos[2]: 1048576
+pushNumCnt[0]: 1048576
+pushNumCnt[1]: 1048576
+pushNumCnt[2]: 1048576
+Nums write to out file: 3145728
+======== All num merged ========
+MergeQueue.size(): 2
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 1048576, filePos[0]: 1048576
+fileNum[1]: 1048576, filePos[1]: 1048576
+fileNum[2]: 1048576, filePos[2]: 1048576
+pushNumCnt[0]: 1048576
+pushNumCnt[1]: 1048576
+pushNumCnt[2]: 1048576
+Nums write to out file: 3145728
+======== All num merged ========
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 2097152, filePos[0]: 2097152
+fileNum[1]: 2097152, filePos[1]: 2097152
+pushNumCnt[0]: 2097152
+pushNumCnt[1]: 2097152
+Nums write to out file: 4194304
+======== All num merged ========
+MergeQueue.size(): 2
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 2097152, filePos[0]: 2097152
+fileNum[1]: 2097152, filePos[1]: 2097152
+pushNumCnt[0]: 2097152
+pushNumCnt[1]: 2097152
+Nums write to out file: 4194304
+======== All num merged ========
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 2097152, filePos[0]: 2097152
+fileNum[1]: 3145728, filePos[1]: 3145728
+pushNumCnt[0]: 2097152
+pushNumCnt[1]: 3145728
+Nums write to out file: 5242880
+======== All num merged ========
+MergeQueue.size(): 2
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 3145728, filePos[0]: 3145728
+fileNum[1]: 4194304, filePos[1]: 4194304
+pushNumCnt[0]: 3145728
+pushNumCnt[1]: 4194304
+Nums write to out file: 7340032
+======== All num merged ========
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 4194304, filePos[0]: 4194304
+fileNum[1]: 5242880, filePos[1]: 5242880
+pushNumCnt[0]: 4194304
+pushNumCnt[1]: 5242880
+Nums write to out file: 9437184
+======== All num merged ========
+MergeQueue.size(): 2
+======== merge loop is over ========
+---OutBuffer is not empty (after loop), writing it to file---
+fileNum[0]: 7340032, filePos[0]: 7340032
+fileNum[1]: 9437184, filePos[1]: 9437184
+pushNumCnt[0]: 7340032
+pushNumCnt[1]: 9437184
+Nums write to out file: 16777216
+======== All num merged ========
+============All num(16777216) in all file is merged into one final out file!============
+========== showing nums in ./data/data_sort/data_sort0.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 80316
+index 1: 240953
+index 2: 722864
+index 3: 2168597
+index 4: 6505796
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort1.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 3985489783
+index 1: 11956469354
+index 2: 21704353878
+index 3: 25489883059
+index 4: 26089583952
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort2.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 380945226
+index 1: 613647042
+index 2: 1142835683
+index 3: 1840941131
+index 4: 3428507054
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort3.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 3320295051
+index 1: 9960885158
+index 2: 29882655479
+index 3: 29911056144
+index 4: 30918247696
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort4.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 726453990
+index 1: 2179361975
+index 2: 3236413123
+index 3: 5738530018
+index 4: 5905088013
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort5.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 5267644600
+index 1: 9193487401
+index 2: 15802933805
+index 3: 19739644323
+index 4: 27580462208
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort6.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 1944986620
+index 1: 5834959865
+index 2: 15261673320
+index 3: 15894367066
+index 4: 17504879600
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort7.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 1947185166
+index 1: 2343582418
+index 2: 5841555503
+index 3: 7030747259
+index 4: 7060860826
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort8.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 10785435445
+index 1: 10818458896
+index 2: 11580881016
+index 3: 14367097473
+index 4: 32356306340
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort9.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 7502012236
+index 1: 11464002396
+index 2: 11783481832
+index 3: 15723759223
+index 4: 21810479871
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort10.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 11832465814
+index 1: 35497397447
+index 2: 35925125331
+index 3: 39502829431
+index 4: 49385943615
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort11.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 842686672
+index 1: 2528060021
+index 2: 7584180068
+index 3: 8471034528
+index 4: 17144421790
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort12.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 7339871973
+index 1: 8992853910
+index 2: 22019615924
+index 3: 26978561735
+index 4: 40205931091
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort13.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 1077981078
+index 1: 3233943239
+index 2: 9701829722
+index 3: 11140876072
+index 4: 19928603218
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort14.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 1183634358
+index 1: 1296997228
+index 2: 3550903079
+index 3: 3890991689
+index 4: 4358586756
+========== end ==========
+========== showing nums in ./data/data_sort/data_sort15.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 4836742351
+index 1: 8420923900
+index 2: 8472441003
+index 3: 8636305378
+index 4: 11104646595
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 0 * 1048576 ] to [ 0 * 1048576 + 5 ] ==========
+index 0: 80316
+index 1: 240953
+index 2: 722864
+index 3: 2168597
+index 4: 6505796
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 1 * 1048576 ] to [ 1 * 1048576 + 5 ] ==========
+index 1048576: 281539380188543
+index 1048577: 281539787303491
+index 1048578: 281539856028350
+index 1048579: 281540133705205
+index 1048580: 281540382371006
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 2 * 1048576 ] to [ 2 * 1048576 + 5 ] ==========
+index 2097152: 562765575411892
+index 2097153: 562765973162501
+index 2097154: 562766076080478
+index 2097155: 562766288671552
+index 2097156: 562766765373420
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 3 * 1048576 ] to [ 3 * 1048576 + 5 ] ==========
+index 3145728: 844027543793233
+index 3145729: 844027956317916
+index 3145730: 844027982996384
+index 3145731: 844028065634429
+index 3145732: 844028953670519
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 4 * 1048576 ] to [ 4 * 1048576 + 5 ] ==========
+index 4194304: 292474322432
+index 4194305: 308341713810
+index 4194306: 312366948172
+index 4194307: 322246411103
+index 4194308: 322263267518
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 5 * 1048576 ] to [ 5 * 1048576 + 5 ] ==========
+index 5242880: 148474877471
+index 5242881: 153614046104
+index 5242882: 154817695044
+index 5242883: 167395397128
+index 5242884: 180347137179
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 6 * 1048576 ] to [ 6 * 1048576 + 5 ] ==========
+index 6291456: 154364185093
+index 6291457: 156463896363
+index 6291458: 159577031743
+index 6291459: 167051393670
+index 6291460: 167247408518
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 7 * 1048576 ] to [ 7 * 1048576 + 5 ] ==========
+index 7340032: 65263195156
+index 7340033: 68940973468
+index 7340034: 71204947805
+index 7340035: 76213988951
+index 7340036: 82250006186
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 8 * 1048576 ] to [ 8 * 1048576 + 5 ] ==========
+index 8388608: 69374787900
+index 8388609: 76662808592
+index 8388610: 77596787063
+index 8388611: 80469315578
+index 8388612: 84366813785
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 9 * 1048576 ] to [ 9 * 1048576 + 5 ] ==========
+index 9437184: 75834507105
+index 9437185: 86979547631
+index 9437186: 88300174766
+index 9437187: 91621343565
+index 9437188: 92766840411
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 10 * 1048576 ] to [ 10 * 1048576 + 5 ] ==========
+index 10485760: 95254101561
+index 10485761: 95906591505
+index 10485762: 95907909965
+index 10485763: 105160574938
+index 10485764: 106523958162
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 11 * 1048576 ] to [ 11 * 1048576 + 5 ] ==========
+index 11534336: 38855628671
+index 11534337: 40931481447
+index 11534338: 42115524960
+index 11534339: 42506421394
+index 11534340: 49932518068
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 12 * 1048576 ] to [ 12 * 1048576 + 5 ] ==========
+index 12582912: 78979170630
+index 12582913: 83669213549
+index 12582914: 102506036326
+index 12582915: 107602873683
+index 12582916: 112676970376
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 13 * 1048576 ] to [ 13 * 1048576 + 5 ] ==========
+index 13631488: 31509699833
+index 13631489: 33355481609
+index 13631490: 36170306367
+index 13631491: 38104903737
+index 13631492: 45714987049
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 14 * 1048576 ] to [ 14 * 1048576 + 5 ] ==========
+index 14680064: 9802328147
+index 14680065: 15517151237
+index 14680066: 25766559792
+index 14680067: 29406984446
+index 14680068: 30050672218
+========== end ==========
+========== showing nums in ./data/data_merge/data_merge_11_15_14_0_2_5_1_7_12_10_3_8_9_6_4_13.bin from index [ 15 * 1048576 ] to [ 15 * 1048576 + 5 ] ==========
+index 15728640: 14050872169
+index 15728641: 14846324581
+index 15728642: 15069059379
+index 15728643: 18314221449
+index 15728644: 20143925981
+========== end ==========
