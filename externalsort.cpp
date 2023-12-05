@@ -4,194 +4,232 @@
 
 #include "dataio.h"
 #include "NumberControler.h"
-#include "Loserheap.h"
+#include "ThreadPool.h"
+#include "KShotMergeMinHeap.h"
 
 
 using namespace std;
 
-string data_orgin = "data_orgin.bin";
-string data_out = "data_out.bin";
 
 // 分配内存（用于生成随机数、存储排序后的随机数、写入排序数）
-int64_t * MemoryAllocate(int64_t MemorySize) {
-	int64_t *memory = (int64_t *) malloc(MemorySize); // 1GB
+int64_t ** MemoryAllocate(unsigned short MemNum, int64_t MemorySize) {
+	int64_t **memory = (int64_t **) malloc(MemNum * sizeof(int64_t *));
 	if (memory == NULL) {
 		cout << "memory is not allocated!" << endl;
 		}
     else {
 		cout << "memory allocate sucess" << endl;
 	}
-
+	for (int i = 0; i<MemNum; i++) {
+		memory[i] = (int64_t *) malloc(MemorySize);
+		if (memory == NULL) {
+			cout << "memory[ " << i << " ] is not allocated!" << endl;
+		}
+		else {
+			cout << "memory[ " << i << " ] allocate sucess" << endl;
+		}
+	}
 	return memory;
 }
 
-void NumPrint(int64_t *mem, string filename) {
+// 文件均分为fileBlock个块，输出前numsPrint个数
+void NumPrint(int64_t *mem, string filename,unsigned short fileBlock, unsigned short numsPrint) {
 	// 抽查排序结果并输出
 	// int64_t *mem = (int64_t *) malloc(MemSize);
-    FILE * fPtrOut = fopen(filename.data(),"rb");
-    if(SortedResultPrint(mem,fPtrOut))
+    FILE * fPtrPrint = fopen(filename.data(),"rb");
+    if(SortedResultPrint(mem, fPtrPrint, fileBlock, numsPrint))
         cout<<"Sorted Results Printed."<<endl;
+	fclose(fPtrPrint);
+	// free(fPtrPrint); // fclose已经回收资源，无需free
 }
 
+
 int main(){
-	int64_t *SortMem = MemoryAllocate(MemSize); // 分配内存（用于排序）
-	int64_t *mergeMem = MemoryAllocate(MergeSize); // 分配内存（用于归并）
-
-	int64_t k,i,j =0;
-	string filenameUnsort[16];
-	for (i = 0; i<16; i++) {
-		filenameUnsort[i] = string("./data_random")+to_string(i);
-	}
-
-
-	// 已生成随机数文件后，运行这几行
-	// 指针数组，每个元素都指向一个未排序文件
-	FILE ** fPtrUnsort = (FILE**)malloc(16*sizeof(FILE *));
-	for (i = 0; i < 16; i++) {
-		fPtrUnsort[i] = fopen(filenameUnsort[i].data(),"rb"); 
-	}
+	// unsigned short fileNum = 16;
+	// int64_t **SortMem = MemoryAllocate(fileNum, MemSize); // 分配内存（用于排序）
+	// // int64_t **mergeMem = MemoryAllocate(1, MergeSize); // 分配内存（用于归并）
 	
-	// // 生成随机数文件用，若随机数文件已经生成，无需运行这几行
+	// int i;
+	// vector <string> filenameUnsort;
+	// for (i = 0; i<16; i++) {
+	// 	filenameUnsort.push_back(string("./data/data_random/data_random")+to_string(i)+string(".bin"));
+	// 	// filenameUnsort[i] = string("./data/data_random/data_random")+to_string(i)+string(".bin");
+	// }
+
+
+	// // 已生成随机数文件后，运行这几行
+	// // 指针数组，每个元素都指向一个未排序文件
 	// FILE ** fPtrUnsort = (FILE**)malloc(16*sizeof(FILE *));
 	// for (i = 0; i < 16; i++) {
-	// 	fPtrUnsort[i] = fopen(filenameUnsort[i].data(),"wb+"); 
+	// 	fPtrUnsort[i] = fopen(filenameUnsort[i].data(),"rb"); 
 	// }
-	// int64_t *NumGeneMem = MemoryAllocate(MemSize); // 分配内存（用于生成随机数）
-	// RandNumFileGenerate(NumGeneMem, fPtrUnsort);
 	
-	// 为文件排序，并将排序结果重新写入新文件
-	FILE ** fPtrSort = (FILE**)malloc(16*sizeof(FILE *));
-	string filenameSort[16];
-	for (i = 0; i<16; i++) {
-		filenameSort[i] = string("./data_sort")+to_string(i);
-	}
-	RandDataFileSort(SortMem, fPtrUnsort, fPtrSort);
+	// // // 生成随机数文件用，若随机数文件已经生成，无需运行这几行
+	// // FILE ** fPtrUnsort = (FILE**)malloc(16*sizeof(FILE *));
+	// // for (i = 0; i < 16; i++) {
+	// // 	fPtrUnsort[i] = fopen(filenameUnsort[i].data(),"wb+"); 
+	// // }
+	// // int64_t *NumGeneMem = MemoryAllocate(MemSize); // 分配内存（用于生成随机数）
+	// // RandNumFileGenerate(NumGeneMem, fPtrUnsort);
 
-	for(i=0; i<16; i++){
-		fPtrSort[i] = fopen(filenameSort[i].data(),"rb+");
-	}
 
+	// // 利用线程池多线程排序,排序结果写入新文件
+	// // RandDataFileSort()提交给线程池;
+	// // SortResult存储排序结果(void),调用.get()函数等待排序完成,以免在排序完成前释放内存/访问文件
+	// FILE ** fPtrSort = (FILE**)malloc(16*sizeof(FILE *));
+	// unsigned short ThreadNum = 16;
+	// ThreadPool ThreadPoolExecutor{ ThreadNum }; // 定义线程池
+	// vector <string> filenameSort;
+	// vector< future<void> > SortResult;
+	// for (i=0; i<16; i++) {
+	// 	filenameSort.push_back(string("./data/data_sort/data_sort")+to_string(i)+string(".bin"));
+	// 	// filenameSort[i] = string("./data/data_sort/data_sort")+to_string(i)+string(".bin");
+	// 	// ThreadPoolExecutor.commit(RandDataFileSort, SortMem[i],filenameUnsort[i], fPtrUnsort[i], filenameSort[i], fPtrSort[i]);
+	// 	SortResult.emplace_back(ThreadPoolExecutor.commit(RandDataFileSort, SortMem[i],filenameUnsort[i], fPtrUnsort[i], filenameSort[i], fPtrSort[i]));
+	// }
+	// // 等待线程排序完成
+	// for (i=0;i<16;i++) {
+	// 	SortResult[i].get();
+	// }
+
+	
+	// free(SortMem);
+	// free(fPtrUnsort);
+	// free(fPtrSort);
+
+
+	// // 抽样输出中间排序结果
 	// int64_t *mem = (int64_t *) malloc(MemSize);
-	// NumPrint(mem, "./data_sort0");
-	// NumPrint(mem, "./data_sort1");
-	// NumPrint(mem, "./data_sort2");
-	// NumPrint(mem, "./data_sort5");
-	// NumPrint(mem, "./data_sort10");
-	// NumPrint(mem, "./data_sort15");
+	// unsigned short fileBlock = 1;
+	// unsigned short numsPrint = 5;
+	// NumPrint(mem, "./data/data_sort/data_sort0.bin", fileBlock, numsPrint);
+	// NumPrint(mem, "./data/data_sort/data_sort1.bin", fileBlock, numsPrint);
+	// NumPrint(mem, "./data/data_sort/data_sort2.bin", fileBlock, numsPrint);
+	// NumPrint(mem, "./data/data_sort/data_sort3.bin", fileBlock, numsPrint);
+	// NumPrint(mem, "./data/data_sort/data_sort4.bin", fileBlock, numsPrint);
+	// NumPrint(mem, "./data/data_sort/data_sort5.bin", fileBlock, numsPrint);
+	// NumPrint(mem, "./data/data_sort/data_sort6.bin", fileBlock, numsPrint);
+	// NumPrint(mem, "./data/data_sort/data_sort7.bin", fileBlock, numsPrint);
 
+	// free(mem);
 	// return 0;
-	
-	// 打开输出文件(若不存在则创建)，允许读和写
-	// 输出文件为二进制格式，用于存储排序后的所有数字
-	FILE * fPtrOut = fopen("./data_out.bin","wb+"); //file Pointer to Output file
-	if (fPtrOut == NULL) {
-		cerr << "Open error (data_out.bin)!" << endl;
-		return 0;
-	}
 
-	// 声明并赋予初始值
-	int Exflag[16];
-	int Memflag[16];
-	int64_t length[16];
-	memset(Exflag, 0, 16);
-	memset(Memflag, 0, 16);
-	memset(length, MergeSizeBlock, 16);
+	// 双线程K路归并排序
+	unsigned short ThreadNum = 16;
+	unsigned short K = 8;
+	unsigned short MergeThread = 2; // filenum/K=16/8=2
+	int i,j;
+	// 分配内存
+	int64_t ***MergeMemInbuf = (int64_t ***) malloc(MergeThread * sizeof(int64_t **));
+	int64_t **MergeMemOutbuf = MemoryAllocate(MergeThread, MergeOutBufSize);
 
-	// 分配内存（指针）
-	int64_t **memPtr =(int64_t**)malloc(16*sizeof(int64_t *));
-	// 指针指向?
-	for(i = 0;i < 16; i++)
-		memPtr[i] = SortMem + MergeSizeBlock*i; // MemSizeBlock/16=MergeSizeBlock
+	FILE ***fPtrMerge = (FILE***)malloc(MergeThread * sizeof(FILE **));
+	vector<vector<string>> filenameMergeVec;
 
-	// 从排序后文件中读取16组MergeSizeBlock(8M)大小的数据到内存mem
-	for(i=0; i<16; i++){
-		int64_t t = 0;
-		t = call(memPtr[i],fPtrUnsort[i]);
-		if (t == 0){
-			Exflag[i] = 1;
-			cout<<"Call Error or File EOF."<<endl;
-		}
-		else if (t < MergeSizeBlock){
-			Exflag[i] = 1;
-			cout <<"FILE EOF."<<endl;
-		}
-	}
+	FILE ** fPtrOut = (FILE **)malloc(K * sizeof(FILE *));
+	vector<string> filenameOutVec;
+	vector<string> tmpVec;
 
-	// 输出每个MergeSizeBlock中第0个数（头数）
-	for (i=0; i<16; i++)
-		cout<<memPtr[i][0]<<endl;
+	ThreadPool ThreadPoolExecutor{ ThreadNum }; // 定义线程池
+	vector< future<void> > MergeResult;
 
-	// 比较16组Block中，每个Block头数的大小，用k记录具有最小头数Block的index
-	int64_t a[16]={0};
-	for (i=0; i<16; i++)
-			a[i] = memPtr[i][0];
-	k = 0;
-	for(i = 1; i<16; i++)
-		if (a[i]<a[k]) k = i;
-	Loserheap lp(a);
-
-	int64_t count = 0;
-	int index;
-
-	int64_t cnt[16]; // 为16个文件分别记录取头数的次数
-	memset(cnt, 0, 16);
-	mergeMem[0] = memPtr[k][0]; // 将16个文件中最小头数作为第一个数
-	count++; // 记录归并次数，也就是把最小头数写入mergeMem的次数
-	index = k;
-	cnt[index] = 1;
-	int64_t loop = 1;
-
-	while(true){
-		if(cnt[index] == length[index]){
-			cout<<"memPtr "<<index<<" is empty!Please Call!"<<endl;
-			length[index] = call(memPtr[index],fPtrUnsort[index]);
-			if (length[index] == 0){
-				Exflag[index] = 1;
-				if (Exflag[0]==1 && Exflag[1]==1 && Exflag[2]==1 && Exflag[3]==1 && Exflag[4]==1 && Exflag[5]==1 && Exflag[6]==1 && Exflag[7]==1)//all are 1
-					break;
-				cout<<"File slice "<<index<<" is over!"<<endl;
-				index = lp.adjust(index,1125899906842679); // ?
-				mergeMem[loop] = lp.getwinner();
-				count++;
-				cnt[index]++;
-				loop++;
-				continue;
-			}
-			else{
-				cnt[index] = 0;
-				index = lp.adjust(index,memPtr[index][cnt[index]]);
-				mergeMem[loop] = lp.getwinner();
-				count++;
-				cnt[index]++;
+	for (i=0; i<MergeThread; i++) {
+		MergeMemInbuf[i] = MemoryAllocate(K, MergeInBufSize);
+		fPtrMerge[i] = (FILE**)malloc(K*sizeof(FILE *));
+		// 打开要归并的文件
+		cout << "start to open sorted (to merge) file" << endl;
+		for (j=0; j<K; j++) {
+			tmpVec.push_back(string("./data/data_sort/data_sort")+to_string(i*K+j)+string(".bin"));
+			cout << "filenameMergeVec[" << i << "][" << j << "]: " << tmpVec[j] << endl;
+			fPtrMerge[i][j] = fopen(tmpVec[j].data(),"rb"); 
+			if (fPtrMerge[i][j] == NULL) {
+				cerr << "Open error (data_sort)!" << endl;
 			}
 		}
-		else{
-			index = lp.adjust(index,memPtr[index][cnt[index]]);
-			mergeMem[loop] = lp.getwinner();
-			count++;
-			cnt[index]++;
-		}
-		loop++;
+		filenameMergeVec.push_back(tmpVec);
+		tmpVec.clear();
 
-		// 若归并内存已满，则将归并结果写入输出文件
-		if ( loop == MemSizeBlock ){
-			loop = 0;
-//			if(1 != send(mergeMem,fPtrOut))
-            if(1 != WriteSortData(mergeMem,fPtrOut))
-			cout<<"Send error"<<endl;
+		// 打开存储归并结果的文件
+		cout << "start to create output file" << endl;
+		filenameOutVec.push_back(string("./data/data_out/data_out")+to_string(i*K+0)+string("_")+to_string((i+1)*K-1)+string(".bin"));
+		fPtrOut[i] = fopen(filenameOutVec[i].data(),"wb+");
+		if (fPtrOut[i] == NULL) {
+			cerr << "Open error (data_out)!" << endl;
 		}
+
+		// K路归并任务提交给线程池
+		cout << "start to submit to threadpool" << endl;
+		MergeResult.emplace_back(ThreadPoolExecutor.commit(KShotMerge, K, MergeMemInbuf[i], MergeMemOutbuf[i], fPtrMerge[i], filenameMergeVec[i], fPtrOut[i]));
+		// KShotMerge(K, MergeMemInbuf[i], MergeMemOutbuf[i], fPtrMerge[i], filenameMergeVec[i], fPtrOut[i]);
 	}
 
-	cout<<count<<endl;
-	fclose(fPtrOut);
+	// 等待线程归并完成
+	for (i=0; i<MergeThread; i++) {
+		MergeResult[i].get();
+		//关闭文件
+		for (j=0; j<K; j++) {
+			fclose(fPtrMerge[i][j]);
+		}
+		fclose(fPtrOut[i]);
+	}
 
-	// // 抽查排序结果并输出
-	// int64_t *mem = (int64_t *) malloc(MemSize);
-	// string filename = "./data_out.bin";
-	// NumPrint(mem, filename);
+	// 抽样输出归并结果
+	int64_t *mem = (int64_t *) malloc(MemSize*8);
+	unsigned short fileBlock = 8;
+	unsigned short numsPrint = 10;
+	for (i=0; i<MergeThread; i++) {
+		NumPrint(mem, filenameOutVec[i], fileBlock, numsPrint);
+	}
+	free(mem);
+
+	// 释放内存
+	free(MergeMemInbuf);
+	free(MergeMemOutbuf);
+
+	// // 单线程K路归并排序
+	// // KShotMerge(unsigned short K, int64_t **MergeMemInbuf, int64_t *MergeMemOutbuf, FILE ** fPtrMerge, vector<string> filenameMergeVec, FILE * fPtrOut)
+	// unsigned short K = 8;
+	// int i;
+	// int64_t **MergeMemInbuf = MemoryAllocate(K, MergeInBufSize);
+	// int64_t *MergeMemOutbuf = MemoryAllocate(1, MergeOutBufSize)[0];
+	// FILE ** fPtrMerge = (FILE**)malloc(K*sizeof(FILE *));
+	// vector<string> filenameMergeVec;
+	// for (i=0; i<K; i++) { // 暂时读取前K个文件，后面版本再更新ls检索文件功能之类的
+	// 	filenameMergeVec.push_back(string("./data/data_sort/data_sort")+to_string(i)+string(".bin"));
+	// 	fPtrMerge[i] = fopen(filenameMergeVec[i].data(),"rb"); 
+	// 	if (fPtrMerge[i] == NULL) {
+	// 		cerr << "Open error (data_sort)!" << endl;
+	// 	}
+	// }
+	// FILE * fPtrOut = (FILE *)malloc(sizeof(FILE *));
+	// string filenameOut = string("./data/data_out/data_out")+to_string(0)+string("_")+to_string(K-1)+string(".bin");
+	// fPtrOut = fopen(filenameOut.data(),"wb+");
+	// if (fPtrOut == NULL) {
+	// 	cerr << "Open error (data_out)!" << endl;
+	// }
+	// // K路归并
+	// KShotMerge(K, MergeMemInbuf, MergeMemOutbuf,  fPtrMerge, filenameMergeVec, fPtrOut);
+
+	// //关闭文件
+	// for (i=0; i<K; i++) {
+	// 	fclose(fPtrMerge[i]);
+	// }
+	// fclose(fPtrOut);
+
+	// // 释放内存
+	// free(MergeMemInbuf);
+	// free(MergeMemOutbuf);
+
+	// // 抽样输出归并结果
+	// int64_t *mem = (int64_t *) malloc(MemSize*8);
+	// unsigned short fileBlock = 8;
+	// unsigned short numsPrint = 10;
+	// NumPrint(mem, filenameOut, fileBlock, numsPrint);
+	// free(mem);
+
 
 	// free...
 
 	return 0;
-}
+} // https://github.com/slDeng1003
 

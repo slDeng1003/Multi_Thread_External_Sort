@@ -2,54 +2,6 @@
 
 using namespace std;
 
-// 内部排序算法：使用<algorithm>库中qsort()函数
-// qsort()原型: void qsort(void *base, int nelem, int width, int (*fcmp)(const void *,const void *));
-// qsort()参数含义：
-// 1 void *base: 待排序数组首地址
-// 2 int nelem: 数组中待排序元素数量
-// 3 int width: 各元素的占用空间大小
-// 4 int (*fcmp)(const void *,const void *): 指向“比较函数"的指针，用于确定排序的顺序
-
-// 为externalsort.cpp中使用的qsort()函数定义"比较函数"（第4个参数）
-// 比较函数，即比较两个元素大小关系的函数
-// 这里比较64位无符号数的大小关系
-int compare(const void* a,const void* b){
-	if (*(int64_t*)a - *(int64_t*)b > 0) // a > b
-		return 1;
-	else if (*(int64_t*)a - *(int64_t*)b < 0) // a < b
-		return -1;
-	else 
-		return 0; // a == b
-}
-
-// 将未排序文件读入内存
-int ReadUnsortData(int64_t* mem,FILE * fPtrUnsort){
-	int64_t nReaded=0;
-	nReaded = fread(mem,sizeof(int64_t),MemSizeBlock,fPtrUnsort);
-	fseek(fPtrUnsort,0,SEEK_SET);
-	
-	if (nReaded == 0)
-		return 0;
-	else if (nReaded == MemSizeBlock)
-		return 1;
-	else
-		return -1;
-}
-
-// 将排序后数据写入文件
-int WriteSortData(int64_t* mem,FILE * fPtrSort){
-	int64_t nWrited=0;
-	nWrited = fwrite(mem,sizeof(int64_t),MemSizeBlock,fPtrSort);
-	fseek(fPtrSort,0,SEEK_SET);
-	if (nWrited == 0)
-		return 0;
-	else if (nWrited == MemSizeBlock)
-		return 1;
-	else
-		return -1;
-}
-
-
 // 创建文件，用于存储未排序数字，允许读和写
 void RandNumFileGenerate (int64_t * mem, FILE **fPtrUnsort) {
 	// 为fPtrUnsort（指针数组）指向的未排序文件生成随机数字
@@ -59,35 +11,76 @@ void RandNumFileGenerate (int64_t * mem, FILE **fPtrUnsort) {
 		cout<<"Success to generate numbers"<<endl;
 }
 
-
-void RandDataFileSort(int64_t * SortMem, FILE ** fPtrUnsort, FILE ** fPtrSort) {
-	// 读取未排序文件，为其排序，然后重新写入该文件
-	int i;
-	string filenameSort[16];
-	for (i = 0; i<16; i++) {
-		filenameSort[i] = string("./data_sort")+to_string(i);
+// 获取文件中int_64t数字的数量
+int GetFileNums(string filename) {
+	ifstream ifs(filename, std::ios::binary | std::ios::in);
+	if (!ifs.is_open())
+	{
+        cout << "file not open!" << endl;
+		return 0;
 	}
-
-	for(i = 0; i<16; i++){
-		// 将未排序文件读入内存
-		if(1 != ReadUnsortData(SortMem,fPtrUnsort[i]))
-			cout<<"Reading unsorted data error"<<endl;
-		fclose(fPtrUnsort[i]);
-		
-		// 后面要改为多线程排序
-		// 为内存中数据排序
-		qsort((void*)SortMem, MemSizeBlock,sizeof(int64_t),compare);
-
-		// 将排序后数据写入新文件
-		fPtrSort[i] = fopen(filenameSort[i].data(), "wb+");
-		if(1 != WriteSortData(SortMem, fPtrSort[i]))
-			cout<<"Writing sorted data error"<<endl;
-		fclose(fPtrSort[i]);
-	}
+	ifs.seekg(0, std::ios::end);
+	int fileNums = (ifs.tellg())/8;
+	ifs.seekg(0, std::ios::beg);
+    cout << "fileNums of " << filename << ": " << fileNums  << " Numbers"<< endl;
+	return fileNums;
 }
 
-// 将排序结果分为16个内存块输出，每个内存块的前30个结果输出
-bool SortedResultPrint(int64_t*mem, FILE *fPtrOut) {
+// 将未排序文件读入内存
+int ReadUnsortData(int64_t* SortMemSingle, FILE * fPtrUnsortSingle, int64_t fileNums){
+	int64_t nRead=0;
+	// cout << "SEEK_CUR before fread: " << ftell(fPtrUnsortSingle)/8 << " Numbers" << endl;
+	nRead = fread(SortMemSingle, sizeof(int64_t), MemSizeBlock, fPtrUnsortSingle);
+	// cout << "SEEK_CUR after fread: " << ftell(fPtrUnsortSingle)/8 << " Numbers" << endl;
+	fseek(fPtrUnsortSingle,0,SEEK_SET);
+	cout << "nRead from file: " << nRead << endl;
+	
+	if (nRead == 0)
+		return 0;
+	else if (nRead == fileNums)
+		return 1;
+	else
+		return -1;
+}
+
+// 将排序后数据写入文件
+int WriteSortData(int64_t* SortMemSingle, FILE * fPtrSortSingle, int64_t fileNums){
+	int64_t nWrited=0;
+	nWrited = fwrite(SortMemSingle,sizeof(int64_t),fileNums,fPtrSortSingle);
+	fseek(fPtrSortSingle,0,SEEK_SET);
+	cout << "nWrited to file: " << nWrited << endl;
+	if (nWrited == 0)
+		return 0;
+	else if (nWrited == fileNums)
+		return 1;
+	else
+		return -1;
+}
+
+
+// 适用于单个线程，每次给单个文件排序，将排序结果写入新文件
+void RandDataFileSort(int64_t * SortMemSingle, string filenameUnsortSingle, FILE * fPtrUnsortSingle, string filenameSortSingle, FILE *fPtrSortSingle) {
+	int fileNums = GetFileNums(filenameUnsortSingle);
+	// 读取未排序文件
+	if(1 != ReadUnsortData(SortMemSingle, fPtrUnsortSingle, fileNums))
+		cout<<"Reading unsorted data error"<<endl;
+	fclose(fPtrUnsortSingle);
+
+	// 排序
+	cout << "======== start sort for " << filenameUnsortSingle << endl;
+	sort(SortMemSingle, SortMemSingle + fileNums);
+	cout << filenameUnsortSingle << " sort over ========" << endl;
+	// 将排序后数据写入新文件
+	fPtrSortSingle = fopen(filenameSortSingle.data(), "wb+");
+	if(1 != WriteSortData(SortMemSingle, fPtrSortSingle, fileNums))
+		cout<<"Writing sorted data error"<<endl;
+	fclose(fPtrSortSingle);
+
+}
+
+
+// 将排序结果分为8个内存块输出，每个内存块的前30个结果输出
+bool SortedResultPrint(int64_t*mem, FILE *fPtrOut, unsigned short fileBlock, unsigned short numsPrint) {
     int64_t i = 0,j = 0;
     int64_t nReaded=0; // 记录单个文件的数据量
     int64_t nSize=0; // 记录所有文件的数据量
@@ -95,40 +88,40 @@ bool SortedResultPrint(int64_t*mem, FILE *fPtrOut) {
     int64_t cnt=0; // 记录次数
 
     // 读取排序文件的数据
-	cout << "SEEK_CUR: " << ftell(fPtrOut)/8 << " Bytes" << endl;
-    nReaded = fread(mem,sizeof(int64_t),MemSizeBlock/8,fPtrOut);
+	// cout << "SEEK_CUR: " << ftell(fPtrOut)/8 << " Numbers" << endl;
+    nReaded = fread(mem,sizeof(int64_t), MemSizeBlock/8, fPtrOut);
     nSize = nSize + nReaded;
-    // 输出每个文件前30个数，用以比较排序结果
+    // 输出每个文件前numsPrint个数，用以比较排序结果
     cout << "========== showing the sorting results " 
     << "form index [" << i << " ] "
-    << "to [ " << i+29 << " ] "
+    << "to [ " << i+numsPrint << " ] "
     << "==========" << endl;
 
     for (i = 0; i < MemSizeBlock; i++){
-        if (i<30) {
+        if (i<numsPrint) {
             cout << "index " << i << ": " << mem[i] << endl;
         }
         cnt++;
     }
     cout << "========== end ==========" << endl;
 
-    for (j=1;j<8;j++){
-		cout << "SEEK_CUR: " << ftell(fPtrOut)/8 << " Bytes" << endl;
+    for (j=1;j<fileBlock;j++){
+		// cout << "SEEK_CUR: " << ftell(fPtrOut)/8 << " Numbers" << endl;
         nReaded = fread(mem,sizeof(int64_t),MemSizeBlock/8,fPtrOut);
         nSize = nSize + nReaded;
         cout << "========== showing the sorting results "
         << "from index [ " << j << " * " << MemSizeBlock/1024/1024 << " * 1024 * 1024 ] " 
-        << "to [ " << j << " * " << MemSizeBlock/1024/1024 << " * 1024 * 1024 + 29 ] "
+        << "to [ " << j << " * " << MemSizeBlock/1024/1024 << " * 1024 * 1024 + " << numsPrint << " ] "
         << "==========" << endl;
         for (i = 0; i < MemSizeBlock; i++){
-            if (i<30) {
+            if (i<numsPrint) {
                 cout << "index " << j * MemSizeBlock + i << ": " << mem[i] << endl;
             }
             cnt++;
         }
         cout << "========== end ==========" << endl;
     }
-	cout << "SEEK_CUR: " << ftell(fPtrOut)/8 << " Bytes" << endl;
+	// cout << "SEEK_CUR: " << ftell(fPtrOut)/8 << " Numbers" << endl;
     
     // 若输出文件中总数据量和设定的外部磁盘大小一致，则所有数据排序成功
     if (nSize == ExSizeBlock && cnt+1 == ExSizeBlock)
@@ -140,7 +133,7 @@ bool SortedResultPrint(int64_t*mem, FILE *fPtrOut) {
 // 从排序后文件中读取MergeSizeBlock(8M)大小数据到内存mem
 int64_t call(int64_t* addr,FILE* fPtr){
 	int64_t nReaded = 0;
-	nReaded = fread(addr,sizeof(int64_t),MergeSizeBlock,fPtr);
+	nReaded = fread(addr,sizeof(int64_t), MemSizeBlock,fPtr);
 //	fseek(fPtr,0,SEEK_SET);
 /*	if (nReaded == 0)
 		return 0;
@@ -154,10 +147,10 @@ int64_t call(int64_t* addr,FILE* fPtr){
 
 int send(int64_t* addr,FILE * fPtr){
 	int64_t nWrited=0;
-	nWrited = fwrite(addr,sizeof(int64_t),MergeSizeBlock,fPtr);
+	nWrited = fwrite(addr,sizeof(int64_t), MemSizeBlock, fPtr);
 	if (nWrited == 0)
 		return 0;
-	else if (nWrited == MergeSizeBlock)
+	else if (nWrited == MemSizeBlock)
 		return 1;
 	else
 		return -1;

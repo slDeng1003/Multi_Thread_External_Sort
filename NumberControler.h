@@ -9,11 +9,17 @@
 #include <time.h>
 
 const int64_t MemSize = 8388608; // 8 M，内存大小（用于生成随机数）
+const int64_t MergeSize = 67108864; // 64 M，总归并内存大小,4*8+32=64M
+const int64_t MergeInBufSize = 4194304; // 4M,归并排序单个输入缓冲区大小
+const int64_t MergeOutBufSize = 33554432; // 32M,归并排序输出缓冲区大小
+
+const int64_t MemSizeBlock = 1048576; // 1M,MemSize/8,代表内存中int64_t的数量
+const int64_t MergeInBufSizeBlock = 524288; // 1/2M,MergeInBufSize/8,代表输入缓冲区int64_t容量
+const int64_t MergeOutBufSizeBlock = 4194304; // 4M,MergeOutBufSize/8,代表输出缓冲区int64_t容量
+
 const int64_t ExSize = 134217728; // 128 M，外部磁盘大小（存储排序后数据）
-const int64_t MergeSize = 67108864; // 64 M，总归并内存大小（为随机数据排序）
-const int64_t MemSizeBlock = 1048576; // 1 M
 const int64_t ExSizeBlock = 16777216; // 16 M
-const int64_t MergeSizeBlock = 8388608; // 8M
+
 /*
 int64_t MemSize = 2097152/2*1024; // (2*1024*1024)/2*1024, 1GB for mem, Bytes for malloc()
 int64_t ExSize = 16777216*1024; // (16*1024*1024)*1024, 16GB for disk
